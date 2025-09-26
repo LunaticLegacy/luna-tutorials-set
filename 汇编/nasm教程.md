@@ -205,6 +205,7 @@ message db "Hello, World!", 0
 | jle | jump if less or equal | <= |
 | jge | jump if greater than or equal | >= |
 | jne | jump if not equal | != |
+| jb  | jump if below | 若CF标志位为1，跳转 | ✅ | `jb label` | | 相当于：`if (CF == 1) jmp label`，需设置标志位 |
 | call | call | 函数调用 | ✅ | `call func` | 调用名为`func`的函数 | 相当于：`push eip` + `jmp func`（将返回地址压入eip后跳转） |
 | ret  | return | 从函数返回 | ✅ | `ret` | 返回到调用函数的地方 | 相当于：`pop eip`（从栈中弹出返回地址，赋值给指令指针） |
 | int | interrupt | 中断 | ✅ | `int 0x80` | 调用中断0x80，即触发Linux系统调用 | 会自动跳转到[IDT](#411-如何写中断向量表idt)中对应的中断处理程序。<br>在没设置好对应编号的IDT时`int`了这个编号会直接Triple Fault。|
@@ -510,7 +511,7 @@ mov rax, cr8    ; 读取当前优先级
 | 1 | R (Readable) / W (Writable) | 1 = 可读（Readable，*可作为数据读取*）<br>0 = 仅执行（Execute‑only，*不得作为数据读取*） | 1 = 可写（Writable）<br>0 = 只读（Read‑only）  |
 | 0 | A (Accessed)   | CPU访问后写1，用于操作系统或硬件跟踪是否被使用 | 同左 |
 
-一个GDT的内存管辖范围为：`[ Base,  Base + (Limit + 1) × (G ? 4096 : 1) − 1 ]`
+一个GDT的内存管辖范围为：`[ Base,  Base + (Limit + 1) × (G ? 4096 : 1) ]`
 
 其中，GDT可以这么写：
 ```
