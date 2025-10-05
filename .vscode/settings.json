@@ -1,0 +1,8 @@
+{
+    "files.associations": {
+        "*.inc": "nasm",
+        "stdio.h": "c",
+        "memory.h": "c",
+        "stdlib.h": "c"
+    }
+}
