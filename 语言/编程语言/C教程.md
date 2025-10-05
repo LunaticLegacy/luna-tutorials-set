@@ -9,6 +9,8 @@ CC-BY-NC-SA 4.0
 
 作者使用的编译器为`GCC`，但推荐新人入坑时从visual studio（使用`MSVC`编译器）开始（至少笔者是这样入坑的）。
 - 此时如果有MSVC特性请按照MSVC特性处理。
+作者使用的编译器为`GCC`，但推荐新人入坑时从visual studio（使用`MSVC`编译器）开始（至少笔者是这样入坑的）。
+- 此时如果有MSVC特性请按照MSVC特性处理。
 
 ### 0.1 你的第一条C程序
 
@@ -56,6 +58,9 @@ long long d = 5;    // 超长整数
 
 浮点数类型包含：
 ```c
+float f = 1.0f;     // 单精度浮点数，IEEE 754标准规定
+double db = 2.0;    // 双精度浮点数，IEEE 754标准规定
+long double ld = 3.0l; // 长双精度浮点数，基于平台
 float f = 1.0f;     // 单精度浮点数，IEEE 754标准规定
 double db = 2.0;    // 双精度浮点数，IEEE 754标准规定
 long double ld = 3.0l; // 长双精度浮点数，基于平台
@@ -151,11 +156,17 @@ char initial = 'A';
 
 #### 1.4.1 算术
 `+ - * / % ++ -- = += -= *= /= %= ()`
+#### 1.4.1 算术
+`+ - * / % ++ -- = += -= *= /= %= ()`
 - `+`和`-`：加减法。如果最终结果超出了当前数据类型所表示的范围，则会溢出或下溢。
+    - 典例：《文明1》中`甘地`的侵略值为`1`，但游戏中保存“侵略值”的变量用的是`unsigned char`。在满足特定条件下，领导人的侵略值会`-2`，此时就可以看到`1-2=255`的名场面——甘地的侵略值现在是`255`，导致他疯狂给印度造核弹，核平全世界。（~~即使这件事后来被证实是个谣言，但这个例子仍然极为有助于记忆~~）
     - 典例：《文明1》中`甘地`的侵略值为`1`，但游戏中保存“侵略值”的变量用的是`unsigned char`。在满足特定条件下，领导人的侵略值会`-2`，此时就可以看到`1-2=255`的名场面——甘地的侵略值现在是`255`，导致他疯狂给印度造核弹，核平全世界。（~~即使这件事后来被证实是个谣言，但这个例子仍然极为有助于记忆~~）
 - `*` 和 `/`：乘除法。对于整数和浮点数而言，该操作的行为会有所不同。
 - `%`：取模（MOD），仅限整数使用。
 - `=`：赋值。**会修改变量**。
+    - 用于赋值，例：`double k = 1.2, x = 0.3, b = 0.1; double y = k * x + b`。
+- `+=` `-=` `*=` `/=` `%=`：操作并赋值。**会修改变量**。
+    - `a += 3`等价于`a = a + 3`，其他以此类推。
     - 用于赋值，例：`double k = 1.2, x = 0.3, b = 0.1; double y = k * x + b`。
 - `+=` `-=` `*=` `/=` `%=`：操作并赋值。**会修改变量**。
     - `a += 3`等价于`a = a + 3`，其他以此类推。
@@ -165,7 +176,12 @@ char initial = 'A';
     - 不要相信`(i++)+(++i)`，能问出这种问题的都是谭浩强C受害者——在同一表达式中多次**修改**同一变量的行为在C语言中属于**未定义行为**，被编译器自行实现。
         - 这个算不算多次修改：`k = k * k + 3`？不算，因为这个表达式只会赋值一次。
 - 运算顺序：先括号里，再括号外。先乘除，后加减。（如果这个都不知道的话，只能说你是小学数学没学好）
+    - 不要相信`(i++)+(++i)`，能问出这种问题的都是谭浩强C受害者——在同一表达式中多次**修改**同一变量的行为在C语言中属于**未定义行为**，被编译器自行实现。
+        - 这个算不算多次修改：`k = k * k + 3`？不算，因为这个表达式只会赋值一次。
+- 运算顺序：先括号里，再括号外。先乘除，后加减。（如果这个都不知道的话，只能说你是小学数学没学好）
 
+#### 1.4.2 逻辑与比较
+`&& || ! == < <= >= > !=`
 #### 1.4.2 逻辑与比较
 `&& || ! == < <= >= > !=`
 逻辑运算符一般配合比较运算符一起使用。
@@ -186,7 +202,17 @@ char initial = 'A';
 位操作：对每一位进行的操作。
 
 `& | ~ << >>`
+这一系列操作符一般被用于[控制流](#5-控制流)。
+
+#### 1.4.3 位操作（Bitwise Operation）
+
+位操作：对每一位进行的操作。
+
+`& | ~ << >>`
 - `&`：按位与。
+    - 对于两个数字的每个二进制位而言，执行与运算。
+    - 例：`char a = 3, b = 10, char c = a & b;`
+    - `0b0011 & 0b1010 = 0b0010`，此时c的值为2。
     - 对于两个数字的每个二进制位而言，执行与运算。
     - 例：`char a = 3, b = 10, char c = a & b;`
     - `0b0011 & 0b1010 = 0b0010`，此时c的值为2。
@@ -194,7 +220,26 @@ char initial = 'A';
     - 对于两个数字的每个二进制位而言，执行或运算。
     - 例：`char a = 3, b = 10, char c = a | b;`
     - `0b0011 & 0b1010 = 0b1011`，此时c的值为11。
+    - 对于两个数字的每个二进制位而言，执行或运算。
+    - 例：`char a = 3, b = 10, char c = a | b;`
+    - `0b0011 & 0b1010 = 0b1011`，此时c的值为11。
 - `~`：按位取反。
+    - 对于单个数字的每个二进制位执行非运算。
+    - 例：`char k = 10; ~k;`，此时k
+- `<<`：左移运算。
+- `>>`：右移运算。
+
+关于位移操作：
+- 对无符号整数：
+    - `x << n` 等价于 `(x * 2^n) mod 2^w`（w是目标无符号类型的位宽）。
+    - `x >> n` 为逻辑右移（高位补 0）。
+- 对有符号整数：
+    - 若左侧操作数为负，或左移导致结果不能用目标类型表示（即溢出），则行为是未定义（UB）。
+    - 右移带符号的有符号整数的行为是**实现定义**（implementation-defined，基于编译器行为）：很多实现做算术右移（高位用符号位填充），也有实现做逻辑右移。**但标准不强制哪种**。
+        - 如果可以，尽量别右移有符号整数。
+
+#### 1.4.4 内存管理
+`* & . [] ->`
     - 对于单个数字的每个二进制位执行非运算。
     - 例：`char k = 10; ~k;`，此时k
 - `<<`：左移运算。
@@ -293,6 +338,36 @@ int main() {
 }
 ```
 
+格式说明符如下：
+| 格式 | 对应类型 | 说明 | 注意事项 |
+| ---- | ------ | ----- | --------- |
+| `%d`/`%i` | `int` | 十进制有符号整数  | `%i`允许处理不同进制输入（主要用于`scanf`） |
+| `%u`| `unsigned int` | 十进制无符号整数  | - |
+| `%f` | `float`（`printf` 会提升为 `double`） | 浮点数 | - |
+| `%lf` | `double` | 浮点数 | `printf` 中 `%f` 和 `%lf` 等效，`scanf` 需用 `%lf` |
+| `%Lf` | `long double` | 扩展精度浮点数  | - |
+| `%c` | `char`（会被提升为 `int`） | 单个字符 | - |
+| `%s` | `char*` | 字符串 | 字符串必须以 `\0` 结尾 |
+| `%p` | `void*` | 指针地址 | 输出平台相关（通常是十六进制）|
+| `%x`/`%X` | `unsigned int`  | 十六进制整数 | `%X` 输出大写字母 |
+| `%o` | `unsigned int` | 八进制整数 | - |
+| `%%` | - | 输出 `%` 字符 | - |
+| `%lld` | `long long` | 十进制长整型 | C99标准 |
+| `%llu` | `unsigned long long` | 十进制长无符号整型 | C99标准 |
+| `%hx` / `%hhd` | `short` / `signed char` | 短整型 / 字节型 | 输出需注意类型提升 |
+| `%zu`| `size_t` (aka `unsigned long long`) | 大小  | - |
+
+当函数为[变参函数](#37-变参函数)时（`printf`是一个变参函数），会发生**类型提升**：
+- `char`(`int8_t`)和`short`(`int16_t`)会被提升为`int`(`int32_t`)。
+    - 但是`int`(`int32__t`)不会被再次提升为`int64_t`。
+- `float`会被提升为`double`。
+
+忘记匹配格式和类型会导致 未定义行为，尤其是指针和整型类型。
+
+除`printf`外，还有其他输出函数：
+- `puts()`：输出字符串，**并在末尾添加换行符**。
+    - 如果`printf`内没有规定格式说明符，编译器一般会用`puts`代替`printf`。
+- `putc()`：输出单个字符
 格式说明符如下：
 | 格式 | 对应类型 | 说明 | 注意事项 |
 | ---- | ------ | ----- | --------- |
@@ -438,6 +513,8 @@ void printWelcome() {
 
 注意：函数**不能**返回[数组](#414-指针与数组)。
 
+注意：函数**不能**返回[数组](#414-指针与数组)。
+
 ### 3.2 函数的调用
 
 要使用函数，需要在代码中调用它：
@@ -498,6 +575,7 @@ void printInfo(char name[], int age) {
 ### 3.4 函数的返回值
 
 函数可以返回值，也可以不返回值（使用`void`关键字）：
+函数可以返回值，也可以不返回值（使用`void`关键字）：
 
 ```c
 // 返回整数的函数
@@ -522,11 +600,13 @@ void printMessage(char message[]) {
 // 返回字符的函数
 char getFirstChar(char str[]) {
     return *(str + 0);  // 为什么要这样？详见“4.1.4 指针与数组”。
+    return *(str + 0);  // 为什么要这样？详见“4.1.4 指针与数组”。
 }
 ```
 
 ### 3.5 函数声明与定义
 
+在C语言中，函数声明（或“函数签名”）告诉编译器函数的名称、返回类型和参数。函数定义包含函数的实际实现。
 在C语言中，函数声明（或“函数签名”）告诉编译器函数的名称、返回类型和参数。函数定义包含函数的实际实现。
 
 ```c
@@ -661,6 +741,84 @@ void printf(const char* fmt, ...) {
 
 
 
+### 3.7 变参函数
+
+理解本函数需要先理解什么是**ABI**，请自行查阅相关资料。
+
+最经典的变参函数：
+
+```c
+void printf(const char *fmt, ...);
+```
+
+在定义了一个变参函数时，请使用头文件`<stdarg.h>`以处理参数。用法：
+
+```c
+#include <stdio.h>
+#include <stdarg.h>
+
+int sum(int n, ...) {
+    va_list args;       // 定义一个参数列表
+    va_start(args, n);  // 参数列表解析开始
+
+    int total = 0;
+    for (int i = 0; i < n; i++) {
+        total += va_arg(args, int);  // 将参数列表内的下一个参数解析为指定类型
+    }
+
+    va_end(args);   // 参数列表解析结束
+    return total;
+}
+
+int main() {
+    printf("%d\n", sum(4, 10, 20, 30, 40));  // 输出 100
+}
+```
+
+让我们复杂一点：
+```c
+// stdio.c
+#include <stdarg.h>
+#include <stdint.h>
+
+// char* itoa(uint64_t int_target, char base)
+// 假设该函数已被定义，该函数功能：将整数转为ascii字符，规定进制。
+
+// 实现一个简单的printf函数，实际上C语言的printf远比该函数实现复杂。
+void printf(const char* fmt, ...) {
+    va_list args;
+    va_start(args, fmt);
+    // parse data.
+    while (*fmt) {      // 控制流详见第5章。
+        if (*fmt == '%') {
+            // numbers format, as: d, x, b, o.
+            fmt++;
+            switch (*fmt) {
+                case 'd':  // decimal
+                    puts(itoa(va_arg(args, long long), 10));
+                    break;
+                case 'x':  // hexadecimal
+                    puts(itoa(va_arg(args, long long), 16));
+                    break;
+                case 'b':  // binary
+                    puts(itoa(va_arg(args, long long), 2));
+                    break;
+                case 'o':  // octal
+                    puts(itoa(va_arg(args, long long), 8));
+                    break;
+            }
+        } else {
+            // just print the character.
+            putc(*fmt, 0, 0);
+        }
+        fmt++;
+    }
+    va_end(args);
+}
+```
+
+
+
 ## 4. 内存管理
 
 在C语言里，内存需要被程序员**手动管理**。
@@ -678,6 +836,7 @@ C程序在运行时，内存通常被划分为几个不同的区域：
 
 2. **数据区（Data Segment）**：
    - 包含全局变量（详见[作用域](#42-作用域)）和静态变量
+   - 包含全局变量（详见[作用域](#42-作用域)）和静态变量
    - 进一步分为已初始化数据区和未初始化数据区（BSS）
 
 3. **堆区（Heap）**：
@@ -693,6 +852,7 @@ C程序在运行时，内存通常被划分为几个不同的区域：
    - 大小有限，过深的递归可能导致**栈溢出**
    - 操作系统会给程序分配一个有限大小的栈区
 
+在**x86（或x86_64）**架构下，内存布局示例：
 在**x86（或x86_64）**架构下，内存布局示例：
 ```
 高地址 -->  +------------------+
@@ -732,6 +892,11 @@ C程序在运行时，内存通常被划分为几个不同的区域：
 
 指针的值为另一个变量的地址。基本语法：
 
+指针是一个整数，其大小为**平台宽度**。
+- 平台宽度：在32位平台下，该值为32位，64位同理。
+
+指针的值为另一个变量的地址。基本语法：
+
 ```c
 数据类型 *指针变量名;
 // 或者：
@@ -745,9 +910,17 @@ int *a, *b;     // a和b均为指针
 int* a, b;      // a是指针，b不是
 ```
 
+在编译器的眼里，上述两种声明方法**完全等价**。但是：
+
+```c
+int *a, *b;     // a和b均为指针
+int* a, b;      // a是指针，b不是
+```
+
 指针类型控制`从该指针指向的位置开始，接下来的一段内存块应被如何解析`。
 - `0x66 0x73 0x6F 0x61`可被解释为4个ASCII字符：`fIoa`，也可以被解释为一个`int32_t`（`1,718,841,185`）或`uint32_t`（`1,718,841,185`）或`int16_t[2]`（`{26227, 28513}`）...
 - 如果不对指向的内存规定类型，则数字将毫无意义。
+    - 指针的类型可以为`void*`，意为“不表达任何意义的指针”。由于该指针极度自由，以至于可以通过强制类型转换到任意类型。但由于该类型指针无意义，如果需要表达意义则**必须**将其进行强制类型转换。
     - 指针的类型可以为`void*`，意为“不表达任何意义的指针”。由于该指针极度自由，以至于可以通过强制类型转换到任意类型。但由于该类型指针无意义，如果需要表达意义则**必须**将其进行强制类型转换。
 
 示例：
@@ -775,9 +948,17 @@ int main() {
 - 及时释放动态分配的内存 - 内存泄漏
 - 注意指针的类型匹配 - 数据类型出错
 
+指针是C语言强大功能的核心，但也容易出错。使用指针时需要注意：
+- 避免使用未初始化的指针 - 未定义行为
+- 避免访问已释放的内存 - 未定义行为
+- 及时释放动态分配的内存 - 内存泄漏
+- 注意指针的类型匹配 - 数据类型出错
+
 #### 4.1.2 指针的声明和初始化
 
 ```c
+#include <stdlib.h>
+
 #include <stdlib.h>
 
 // 声明指针
@@ -794,7 +975,14 @@ int *nullPtr = NULL;  // 或者 int *nullPtr = 0;
 
 // 表达任意类型的指针
 void* buffer = malloc(32);
+
+// 表达任意类型的指针
+void* buffer = malloc(32);
 ```
+
+其中，`NULL`是一个宏定义，来自`<stdlib.h>`，其在C中的原型为：`#define NULL ((void *)0)`。
+- 访问0地址将导致`SegFault`。（请自行查阅，该错误属于CPU底层级错误）
+- 在C++中，`NULL`被直接定义为：`#define NULL 0`，该语言中表示空白指针时需用`nullptr`。
 
 其中，`NULL`是一个宏定义，来自`<stdlib.h>`，其在C中的原型为：`#define NULL ((void *)0)`。
 - 访问0地址将导致`SegFault`。（请自行查阅，该错误属于CPU底层级错误）
@@ -836,8 +1024,10 @@ int main() {
 
 int main() {
     int arr[5] = {10, 20, 30, 40, 50};  // 定义数组
+    int arr[5] = {10, 20, 30, 40, 50};  // 定义数组
     
     // 以下三种方式是等价的
+    printf("第一种: %d\n", arr[0]); // 访问数组的第一个元素
     printf("第一种: %d\n", arr[0]); // 访问数组的第一个元素
     printf("第二种: %d\n", *arr);
     printf("第三种: %d\n", *(arr + 0));
@@ -848,6 +1038,29 @@ int main() {
         printf("元素: %d\n", *ptr);
     }
     
+    return 0;
+}
+```
+
+访问数组元素可使用操作符`[]`。如：
+```c
+int main() {
+    int arr[5] = {10, 20, 30, 40, 50};  // 定义数组
+
+    int value1 = arr[0];    // 第一个元素
+    int value2 = arr[1];    // 第二个元素
+    return 0;
+}
+```
+- 为什么是0开头？历史遗留问题——该值一般被解读为“偏移值”，即距离开头偏移多少个单位。
+
+也可以使用[指针运算](#418-指针的运算)：
+```c
+int main() {
+    int arr[5] = {10, 20, 30, 40, 50};  // 定义数组
+
+    int value1 = *(arr + 0);    // 第一个元素
+    int value2 = *(arr + 1);    // 第二个元素
     return 0;
 }
 ```
@@ -886,6 +1099,16 @@ int[] error_func() {
 ```
 
 如果该函数返回了`arr`（类型实际为`int*`），那么当后来再有定义变量时，它将覆盖原数组的位置。该行为为**未定义行为**。
+- 而由于作用域和堆栈要求，函数**不能直接返回一个数组**，即不得定义如下内容：
+
+```c
+int[] error_func() {
+    int arr[5] = {10, 20, 30, 40, 50};  // 定义数组
+    return arr;
+};
+```
+
+如果该函数返回了`arr`（类型实际为`int*`），那么当后来再有定义变量时，它将覆盖原数组的位置。该行为为**未定义行为**。
 
 #### 4.1.5 指针与函数
 
@@ -893,6 +1116,8 @@ int[] error_func() {
 1. 通过指针修改函数外部的变量（引用传递）
 2. 函数返回多个值
 3. 提高大型数据结构传递的效率
+    - 如果要直接传递一个大型结构体，而不是指向该结构体的指针，那么所有操作都会在栈上执行——可能会导致效率下降。（请参考不同平台的ABI调用约定）
+4. （在裸机开发或驱动开发中）依靠强制转换为内存地址，锁死一个内存地址的类型并解析数据。
     - 如果要直接传递一个大型结构体，而不是指向该结构体的指针，那么所有操作都会在栈上执行——可能会导致效率下降。（请参考不同平台的ABI调用约定）
 4. （在裸机开发或驱动开发中）依靠强制转换为内存地址，锁死一个内存地址的类型并解析数据。
 
@@ -1001,19 +1226,55 @@ int main() {
 指针的运算可被用于**数组**运算。
 
 ### 4.2 作用域（Scope）
+注意：指针函数（Function returns a pointer）和函数指针（Pointer to a function）是两个东西。
+
+#### 4.1.8 指针的运算
+
+对指针的有效计算有：`+`和`-`。其中：
+```c
+#include <stdio.h>
+#include <stdint.h>
+
+int main() {
+    int32_t* k = (int32_t*)1000;  // 直接写一个访问内存位置1000（0x3E8）的东西
+    int32_t* m = k + 1;     // 从算术上：1000 + 1 * sizeof(int32_t) = 1004
+    int32_t* n = k - 1;     // 从算术上：1000 - 1 * sizeof(int32_t) = 996
+    printf("%d, %d\n", m, n);  // 1004, 996
+}
+```
+
+- 指针和数字的加减法：
+    - 对内存地址的实际操作**不会**默认以`byte`为单位，而以`指针类型`为单位。
+        - 除非定义的指针类型就是`char*`。
+    - `-`：向低地址减少若干个指针类型单位。*低地址：数字较小的内存地址。*
+    - `+`：向高地址增加若干个指针类型单位。*高地址：数字较大的内存地址。*
+    - `++`和`--`：递增或递减1个指针类型单位。
+- 指针和指针：
+    - `-`：返回两个指针中间隔了多少个元素。
+    - `+`：**无效**：指针之间做加法毫无意义。
+    - `>`和`<`：指针
+- 对`void*`执行加减法是未定义行为。
+
+指针的运算可被用于**数组**运算。
+
+### 4.2 作用域（Scope）
 
 作用域为一个变量的存在范围，使用`{}`规定作用域。例如：
 
 ```c
 #include <stdio.h>
+#include <stdio.h>
 
 int main() {
     int outer = 3;    // 在作用域外定义3
     volatile int* pointer;  // volatile：告诉编译器不要优化掉它
+    volatile int* pointer;  // volatile：告诉编译器不要优化掉它
     {
         int inner = 5;  // 在作用域内定义5
         pointer = &inner;   // 写入指针
+        pointer = &inner;   // 写入指针
     }
+    short overwrite = 8;
     short overwrite = 8;
     printf("%d\n", *pointer);
 }
@@ -1021,6 +1282,102 @@ int main() {
 
 为什么我要知道“作用域”？
 - “作用域”的底层是**栈地址**（涉及系统底层）。
+- 在实际的C语言编程中，如果一个数组需要在其他位置使用，则**不得将其分配在栈内存中**，请使用`malloc`将其分配到堆内存中。
+
+作用域包括**局部作用域**、**全局作用域**及**文件作用域**。
+
+| 类型 | 定义位置 | 可见范围 | 生命周期 | 存储位置  |
+| ----- | --- | ------ | ------ | ------- |
+| **局部作用域（Local Scope）** | 函数或块 `{}` 内 | 块内可见 | 执行到块结束 | 栈（Stack）          |
+| **全局作用域（Global Scope）** | 所有函数外部 | 整个文件可见 | 程序整个运行期 | 数据区（Data Segment） |
+| **文件作用域（File Scope）** | 使用`static`限定的全局变量 | 当前文件 | 程序整个运行期 | 全局区 |
+| **函数原型作用域**  | 函数声明中参数 | 函数声明时  | 不存在运行期 | 编译时可见 |
+
+例：
+
+```c
+// 在main.c中
+#include <stdio.h>
+#include <stdint.h>
+
+int global_times = 3;   // 此时该变量为全局变量
+```
+
+如何在其他文件中访问该变量？使用`extern`关键字。
+```c
+// another.c
+extern int global_times;
+```
+
+将`main.c`和`another.c`一起编译，并输出为同一个可执行文件。此时在another.c中也可以实现该内容。
+
+> `extern`关键字也可以用于调度外部函数，只要给出外部函数签名即可。
+
+### 4.3 动态内存分配
+
+动态内存分配的函数有：`malloc` `calloc` `realloc`，及用于释放内存的函数：`free`。
+- 需导入`<stdlib.h>`头文件。
+
+其函数原型分别为：
+```c
+void *malloc(size_t _Size);
+void *calloc(size_t _NumOfElements, size_t _SizeOfElements);
+void *realloc(void *_Memory, size_t _NewSize);
+void free(void *_Memory);
+```
+
+其行为分别为：
+- `malloc`：分配指定`byte`数的内存。
+- `calloc`：给定元素数量和元素大小，并返回分配内存起点。
+- `realloc`：重新调整已有内存块大小。如果`_NewSize == 0`，则等价于`free(_Memory)`。
+    - 对于上述三个`alloc`系函数而言，如果内存分配失败，它们将返回`NULL`。
+- `free`：释放被分配的内存块。
+    - 不能对已经被释放的内存再次释放。
+例：    
+```c
+#include <stdlib.h>
+
+int main() {
+    int* buffer = (int*)malloc(sizeof(int) * 4);  // 分配一个可容纳4个int的内存
+    // 写入数组信息
+    *(buffer+0) = 3;
+    *(buffer+1) = 33;
+    *(buffer+2) = 333;
+    *(buffer+3) = 3333;
+    // 访问
+    int alpha = buffer[0];
+    int bravo = buffer[1];
+    int charlie = buffer[2];
+    int delta = buffer[3];
+    // 释放内存
+    free(buffer);
+    // free(buffer);    // 禁止：操作系统禁止对同一块内存释放两次。
+    // int echo = buffer[0];    // 禁止：访问被释放的内存是不被允许的。
+    buffer = NULL;  // 在释放内存后的下一步建议立即设NULL
+    // int foxroat = buffer[0];  // 禁止：禁止访问NULL。
+}
+```
+
+上述四个函数将调用操作系统功能以在程序运行期间动态分配内存。
+
+反例（内存泄漏）：
+```c
+#include <stdlib.h>
+#include <pthread.h>  // 见后文“多线程”章节
+
+void unsafeThread() {
+    void* consume = malloc(4096);   // 4096 bytes = 4kb，一次来一页的。
+    // 只alloc()，不free()。不出几秒系统内存就会被全部吃光光。
+}
+
+int main() {
+    const size_t THREAD_NUM = 114514;   // 好臭的线程（悲）
+    pthread_t threads[THREAD_NUM];  // 如果栈真的能塞下这么大的东西
+    for (int i = 0; i < THREAD_NUM; i++) {
+        pthread_create(&threads[i], NULL, unsafeThread, NULL);
+    }
+}
+```
 - 在实际的C语言编程中，如果一个数组需要在其他位置使用，则**不得将其分配在栈内存中**，请使用`malloc`将其分配到堆内存中。
 
 作用域包括**局部作用域**、**全局作用域**及**文件作用域**。
@@ -1125,6 +1482,9 @@ int main() {
 ### 5.1 条件分支
 
 `if` / `else if` / `else`
+### 5.1 条件分支
+
+`if` / `else if` / `else`
 
 ```c
 if (condition) {
@@ -1156,6 +1516,7 @@ int main() {
 ### 5.2 多分支（switch）
 
 当根据整型或枚举值选择不同路径时，`switch`远比一系列的`if-else`更清晰：
+当根据整型或枚举值选择不同路径时，`switch`远比一系列的`if-else`更清晰：
 
 ```c
 switch (expr) {
@@ -1172,6 +1533,8 @@ switch (expr) {
 
 注意：忘记`break`会导致“穿透”（fall-through）。该特性有时可有意为之。
 - 穿透：在`switch`内，自动执行其他`case`项，或`default`项。
+注意：忘记`break`会导致“穿透”（fall-through）。该特性有时可有意为之。
+- 穿透：在`switch`内，自动执行其他`case`项，或`default`项。
 
 ### 5.3 循环（for / while / do-while）
 
@@ -1184,13 +1547,16 @@ for (int i = 0; i < n; i++) {
 ```
 
 `while`循环：先判断条件再执行。
+`while`循环：先判断条件再执行。
 
 ```c
 while (cond) {
     // 当 cond 为真时重复，直到不再是真实内容。
+    // 当 cond 为真时重复，直到不再是真实内容。
 }
 ```
 
+`do-while`：至少执行一次，然后判断条件。
 `do-while`：至少执行一次，然后判断条件。
 
 ```c
@@ -1220,6 +1586,7 @@ int main() {
 - `return`：从函数返回。
 
 示例（使用`continue`跳过偶数）：
+示例（使用`continue`跳过偶数）：
 
 ```c
 for (int i = 0; i < 10; i++) {
@@ -1231,10 +1598,14 @@ for (int i = 0; i < 10; i++) {
 示例：
 
 
+示例：
+
+
 ### 5.5 常见陷阱与建议
 
 - 不要在同一表达式中对同一变量进行多次修改（未定义行为），例如 `(i++) + (++i)`。
 - 注意整型溢出与有符号/无符号比较。
+- 处理循环中的边界条件时，`画图`或写测试用例帮助验证。
 - 处理循环中的边界条件时，`画图`或写测试用例帮助验证。
 
 ## 6. 文件IO
@@ -1242,10 +1613,15 @@ for (int i = 0; i < 10; i++) {
 文件I（Input）/O（Output）是程序与磁盘文件交互的基本手段。标准C提供了一套以 `FILE*` 为中心的 API（`fopen`/`fclose`/`fread`/`fwrite`/`fprintf`/`fscanf` 等）。
 - 其中，`FILE*`直接描述文件。
 - 引入`<stdio.h>`以使用文件IO。
+文件I（Input）/O（Output）是程序与磁盘文件交互的基本手段。标准C提供了一套以 `FILE*` 为中心的 API（`fopen`/`fclose`/`fread`/`fwrite`/`fprintf`/`fscanf` 等）。
+- 其中，`FILE*`直接描述文件。
+- 引入`<stdio.h>`以使用文件IO。
 
 ### 6.1 打开与关闭文件
 
 ```c
+#include <stdio.h>
+
 #include <stdio.h>
 
 FILE *f = fopen("path/to/file.txt", "r"); // r: 只读, w: 覆盖写入, a: 追加
@@ -1264,6 +1640,8 @@ fclose(f);
 ```c
 #include <stdio.h>
 
+#include <stdio.h>
+
 FILE *out = fopen("out.txt", "w");
 if (out) {
     fprintf(out, "姓名: %s 年龄: %d\n", "张三", 30);
@@ -1275,6 +1653,8 @@ if (out) {
 读文本：
 
 ```c
+#include <stdio.h>
+
 #include <stdio.h>
 
 char buf[256];
@@ -1298,6 +1678,8 @@ if (in) {
 ```c
 #include <stdio.h>
 
+#include <stdio.h>
+
 struct Point { int x, y; } p = {1,2};
 FILE *fb = fopen("pts.bin", "wb");
 fwrite(&p, sizeof(p), 1, fb);
@@ -1316,6 +1698,8 @@ fclose(fr);
 ```c
 #include <stdio.h>
 
+#include <stdio.h>
+
 fseek(f, 0, SEEK_END);
 long sz = ftell(f);
 fseek(f, 0, SEEK_SET); // 回到文件开头
@@ -1325,6 +1709,8 @@ fseek(f, 0, SEEK_SET); // 回到文件开头
 
 ### 6.5 错误处理
 
+- 使用`ferror(FILE*)`和`feof(FILE*)`判断错误或文件结束。
+- 用`perror("fopen")`或`strerror(errno)`打印错误信息。
 - 使用`ferror(FILE*)`和`feof(FILE*)`判断错误或文件结束。
 - 用`perror("fopen")`或`strerror(errno)`打印错误信息。
 
@@ -1357,6 +1743,7 @@ char *read_all(const char *path) {
 ## 7. 结构体（struct）与 typedef
 
 结构体用于把不同类型的数据**组合**在一起，常用于表示记录或对象样式的数据。
+结构体用于把不同类型的数据**组合**在一起，常用于表示记录或对象样式的数据。
 
 ```c
 struct Person {
@@ -1369,7 +1756,9 @@ struct Person p = {"张三", 30, 175.5};
 printf("%s %d %.1f\n", p.name, p.age, p.height);
 ```
 对于一个结构体而言，其内部的内存是**连续**的。
+对于一个结构体而言，其内部的内存是**连续**的。
 
+可以使用`typedef`为类型创建别名，常与结构体一起使用以简化类型名：
 可以使用`typedef`为类型创建别名，常与结构体一起使用以简化类型名：
 
 ```c
@@ -1500,6 +1889,7 @@ int main() {
     pthread_create(&t1, NULL, worker, &id1);
     pthread_create(&t2, NULL, worker, &id2);
     pthread_join(t1, NULL); // join函数会阻塞时间，
+    pthread_join(t1, NULL); // join函数会阻塞时间，
     pthread_join(t2, NULL);
     return 0;
 }
@@ -1521,9 +1911,23 @@ int main() {
 
 - 基本用法（POSIX pthreads）：
 
+### 8.2 互斥、条件变量和锁机制
+
+当多个线程访问共享资源（内存、文件、I/O 等）时，必须使用同步原语以避免数据竞争（data race）和不一致状态。下面按类别介绍常用同步原语、使用模式与示例。
+
+小名词提醒：
+- 临界区（critical section）：对共享资源的访问段，需要互斥保护。
+- 死锁（deadlock）：多个线程互相等待对方持有的锁，导致无法继续执行。
+- 活锁、饥饿：线程不断尝试但无法获得资源或被频繁抢占。
+
+1) 互斥锁（mutex）
+
+- 基本用法（POSIX pthreads）：
+
 ```c
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_lock(&m);
+// 修改共享数据（临界区）
 // 修改共享数据（临界区）
 pthread_mutex_unlock(&m);
 ```
@@ -1600,10 +2004,158 @@ sem_destroy(&sem);
 5) 条件变量（condition variable）——等待/通知模式
 
 - 条件变量用于在线程间等待某个条件（通常与互斥锁配合）：
+- 属性与变种：
+    - 默认（fast）mutex：快速但对死锁检测有限；在不同实现上行为略有差异。
+    - 递归（recursive）mutex：同一线程可重复加锁多次（需对应次数解锁）。使用场景：递归函数或在持锁时调用可能再次获得锁的库函数。
+        ```c
+        pthread_mutexattr_t attr;
+        pthread_mutexattr_init(&attr);
+        pthread_mutexattr_settype(&attr, PTHREAD_MUTEX_RECURSIVE);
+        pthread_mutex_t rm;
+        pthread_mutex_init(&rm, &attr);
+        ```
+    - robust（可靠）mutex：当持锁线程崩溃时，其他线程可以检测并接手恢复（非所有平台都支持）。
+
+- 错误处理：始终检查返回值（尤其在初始化、加锁/解锁时）。在可能抛出异常或线程中断的环境中，尽量使用 RAII 风格包装（C++）或确保 finally/cleanup 路径释放锁。
+
+2) 读写锁（rwlock）
+
+- 读写锁允许多个读线程并发访问，但写线程独占访问，适用于读多写少场景：
+
+```c
+pthread_rwlock_t rw = PTHREAD_RWLOCK_INITIALIZER;
+// 读者：
+pthread_rwlock_rdlock(&rw);
+// 读取共享数据
+pthread_rwlock_unlock(&rw);
+
+// 写者：
+pthread_rwlock_wrlock(&rw);
+// 修改共享数据
+pthread_rwlock_unlock(&rw);
+```
+
+- 注意事项：读写锁可引起写者饥饿（长期读者阻塞写者）。可根据实现选择公平策略或使用读者优先/写者优先变体。
+
+3) 自旋锁（spinlock）
+
+- 自旋锁在循环中忙等待（busy-wait），适合临界区非常短且线程切换成本高（/内核不可抢占短操作）的场景。
+
+```c
+#include <pthread.h>
+pthread_spinlock_t s;
+pthread_spin_init(&s, PTHREAD_PROCESS_PRIVATE);
+pthread_spin_lock(&s);
+// 临界区（短）
+pthread_spin_unlock(&s);
+pthread_spin_destroy(&s);
+```
+
+- 自旋锁不要用于可能被阻塞/睡眠的场景，否则会浪费 CPU 并可能导致活锁。
+
+4) 信号量（semaphore）
+
+- POSIX 信号量既可以用于进程间（named semaphore）也可用于线程间（unnamed semaphore），常用于计数资源或实现生产者-消费者模型：
+
+```c
+#include <semaphore.h>
+sem_t sem;
+sem_init(&sem, 0, 0); // pshared=0 表示线程间
+
+// 生产者：发布
+sem_post(&sem);
+
+// 消费者：等待
+sem_wait(&sem);
+
+sem_destroy(&sem);
+```
+
+- 注意：sem_wait 可阻塞线程，sem_trywait 可做非阻塞尝试。
+
+5) 条件变量（condition variable）——等待/通知模式
+
+- 条件变量用于在线程间等待某个条件（通常与互斥锁配合）：
 
 ```c
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
+pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cv = PTHREAD_COND_INITIALIZER;
+
+// 等待线程：
+pthread_mutex_lock(&m);
+while (!predicate()) { // 使用 while 而不是 if，防止虚假唤醒
+        pthread_cond_wait(&cv, &m); // atomically unlock m and wait
+}
+// predicate 满足，处理共享数据
+pthread_mutex_unlock(&m);
+
+// 通知线程：
+pthread_mutex_lock(&m);
+// 更新状态，使 predicate() 为真
+pthread_cond_signal(&cv);    // 唤醒一个等待者
+// 或者 pthread_cond_broadcast(&cv); // 唤醒所有等待者
+pthread_mutex_unlock(&m);
+```
+
+- 关键点：
+    - `pthread_cond_wait` 调用会在原子性地解锁互斥锁后进入等待，返回时会重新加锁。必须在加锁状态下调用 `pthread_cond_wait`。
+    - 用 `while` 循环检查条件以应对虚假唤醒或多个线程竞争唤醒的情况。
+    - `pthread_cond_signal` 只是通知一个等待线程；若多个线程需同时继续，应使用 `pthread_cond_broadcast`。
+
+6) 避免死锁的常见策略
+
+- 按固定顺序加锁（lock ordering）。
+- 使用 trylock（非阻塞尝试）并在失败时回退释放已持有的锁然后重试或采取其他策略。
+- 限制锁的粒度与持有时间，尽量缩小临界区。
+- 使用更高级的并发数据结构或无锁算法（lock-free）以减少锁竞争。
+
+7) C11 原子（stdatomic.h）简介
+
+- C11 标准提供了原子类型和原子操作，用于实现无数据竞争的并发访问。核心头文件为 `<stdatomic.h>`。
+
+简单示例：
+
+```c
+#include <stdatomic.h>
+atomic_int a = 0;
+atomic_fetch_add(&a, 1); // 原子加
+int v = atomic_load(&a); // 原子读
+atomic_store(&a, 5);     // 原子写
+```
+
+- memory_order（内存序）常用选项：
+    - `memory_order_relaxed`：仅保证原子性，不保证跨线程的可见性顺序。
+    - `memory_order_acquire`：在加载操作上使用，保证随后的读/写不会被重排序到 acquire 之前。
+    - `memory_order_release`：在存储操作上使用，保证之前的读/写不会被重排序到 release 之后。
+    - `memory_order_acq_rel`：load+store 的复合语义（用于 read-modify-write 操作）。
+    - `memory_order_seq_cst`：最严格的序，提供全序一致性（默认）。
+
+示例（release-acquire 通信）：
+
+```c
+atomic_int flag = 0;
+int data = 0;
+
+// 生产者
+data = 42;                     // 普通写数据
+atomic_store_explicit(&flag, 1, memory_order_release);
+
+// 消费者
+if (atomic_load_explicit(&flag, memory_order_acquire) == 1) {
+        // 现在可以安全读取 data
+        printf("data = %d\n", data);
+}
+```
+
+- 使用原子变量可避免某些情形下的锁，但需要理解内存序和可见性语义；错误使用会导致难以察觉的并发 bug。
+
+8) 小结与推荐实践
+
+- 优先使用互斥锁 + 条件变量实现常见的等待/通知逻辑；当性能成为瓶颈时分析是否使用读写锁或自旋锁（仅限短临界区）。
+- 对跨进程同步，使用 POSIX 命名信号量或系统级同步原语（如 futex、Win32 同步对象）。
+- 当需要高性能并发结构时，学习 C11 原子和 lock-free 算法；在不熟悉内存序时优先使用 `memory_order_seq_cst`。
+
 
 // 等待线程：
 pthread_mutex_lock(&m);
