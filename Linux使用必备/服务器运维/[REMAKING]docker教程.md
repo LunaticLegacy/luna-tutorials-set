@@ -169,7 +169,7 @@ docker exec -it luna psql -U postgres
 ```
 其中，`exec`指令的使用说明如下：
 - `-U`：user，指定进入容器内的用户名，默认为`root`——但有些容器可能不认这个名字，所以请自行指定名字。
-- `-i`：保持标准输入流（`stdin`）打开。速记：`interactive`。
+- `-i`：保持标准输入流（`stdin`）打开。速记：`in`。
 - `-t`：为该指令分配一个伪终端。速记：`tty`。
 
 ```bash

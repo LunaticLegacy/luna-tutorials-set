@@ -9,8 +9,6 @@ CC-BY-NC-SA 4.0
 
 作者使用的编译器为`GCC`，但推荐新人入坑时从visual studio（使用`MSVC`编译器）开始（至少笔者是这样入坑的）。
 - 此时如果有MSVC特性请按照MSVC特性处理。
-作者使用的编译器为`GCC`，但推荐新人入坑时从visual studio（使用`MSVC`编译器）开始（至少笔者是这样入坑的）。
-- 此时如果有MSVC特性请按照MSVC特性处理。
 
 ### 0.1 你的第一条C程序
 
@@ -160,7 +158,6 @@ char initial = 'A';
 `+ - * / % ++ -- = += -= *= /= %= ()`
 - `+`和`-`：加减法。如果最终结果超出了当前数据类型所表示的范围，则会溢出或下溢。
     - 典例：《文明1》中`甘地`的侵略值为`1`，但游戏中保存“侵略值”的变量用的是`unsigned char`。在满足特定条件下，领导人的侵略值会`-2`，此时就可以看到`1-2=255`的名场面——甘地的侵略值现在是`255`，导致他疯狂给印度造核弹，核平全世界。（~~即使这件事后来被证实是个谣言，但这个例子仍然极为有助于记忆~~）
-    - 典例：《文明1》中`甘地`的侵略值为`1`，但游戏中保存“侵略值”的变量用的是`unsigned char`。在满足特定条件下，领导人的侵略值会`-2`，此时就可以看到`1-2=255`的名场面——甘地的侵略值现在是`255`，导致他疯狂给印度造核弹，核平全世界。（~~即使这件事后来被证实是个谣言，但这个例子仍然极为有助于记忆~~）
 - `*` 和 `/`：乘除法。对于整数和浮点数而言，该操作的行为会有所不同。
 - `%`：取模（MOD），仅限整数使用。
 - `=`：赋值。**会修改变量**。
@@ -176,12 +173,7 @@ char initial = 'A';
     - 不要相信`(i++)+(++i)`，能问出这种问题的都是谭浩强C受害者——在同一表达式中多次**修改**同一变量的行为在C语言中属于**未定义行为**，被编译器自行实现。
         - 这个算不算多次修改：`k = k * k + 3`？不算，因为这个表达式只会赋值一次。
 - 运算顺序：先括号里，再括号外。先乘除，后加减。（如果这个都不知道的话，只能说你是小学数学没学好）
-    - 不要相信`(i++)+(++i)`，能问出这种问题的都是谭浩强C受害者——在同一表达式中多次**修改**同一变量的行为在C语言中属于**未定义行为**，被编译器自行实现。
-        - 这个算不算多次修改：`k = k * k + 3`？不算，因为这个表达式只会赋值一次。
-- 运算顺序：先括号里，再括号外。先乘除，后加减。（如果这个都不知道的话，只能说你是小学数学没学好）
 
-#### 1.4.2 逻辑与比较
-`&& || ! == < <= >= > !=`
 #### 1.4.2 逻辑与比较
 `&& || ! == < <= >= > !=`
 逻辑运算符一般配合比较运算符一起使用。
@@ -195,13 +187,6 @@ char initial = 'A';
 - `>=`：大于或等于
 - `!=`：不等于
 
-这一系列操作符一般被用于[控制流](#5-控制流)。
-
-#### 1.4.3 位操作（Bitwise Operation）
-
-位操作：对每一位进行的操作。
-
-`& | ~ << >>`
 这一系列操作符一般被用于[控制流](#5-控制流)。
 
 #### 1.4.3 位操作（Bitwise Operation）
@@ -224,22 +209,6 @@ char initial = 'A';
     - 例：`char a = 3, b = 10, char c = a | b;`
     - `0b0011 & 0b1010 = 0b1011`，此时c的值为11。
 - `~`：按位取反。
-    - 对于单个数字的每个二进制位执行非运算。
-    - 例：`char k = 10; ~k;`，此时k
-- `<<`：左移运算。
-- `>>`：右移运算。
-
-关于位移操作：
-- 对无符号整数：
-    - `x << n` 等价于 `(x * 2^n) mod 2^w`（w是目标无符号类型的位宽）。
-    - `x >> n` 为逻辑右移（高位补 0）。
-- 对有符号整数：
-    - 若左侧操作数为负，或左移导致结果不能用目标类型表示（即溢出），则行为是未定义（UB）。
-    - 右移带符号的有符号整数的行为是**实现定义**（implementation-defined，基于编译器行为）：很多实现做算术右移（高位用符号位填充），也有实现做逻辑右移。**但标准不强制哪种**。
-        - 如果可以，尽量别右移有符号整数。
-
-#### 1.4.4 内存管理
-`* & . [] ->`
     - 对于单个数字的每个二进制位执行非运算。
     - 例：`char k = 10; ~k;`，此时k
 - `<<`：左移运算。
@@ -738,86 +707,6 @@ void printf(const char* fmt, ...) {
     va_end(args);
 }
 ```
-
-
-
-### 3.7 变参函数
-
-理解本函数需要先理解什么是**ABI**，请自行查阅相关资料。
-
-最经典的变参函数：
-
-```c
-void printf(const char *fmt, ...);
-```
-
-在定义了一个变参函数时，请使用头文件`<stdarg.h>`以处理参数。用法：
-
-```c
-#include <stdio.h>
-#include <stdarg.h>
-
-int sum(int n, ...) {
-    va_list args;       // 定义一个参数列表
-    va_start(args, n);  // 参数列表解析开始
-
-    int total = 0;
-    for (int i = 0; i < n; i++) {
-        total += va_arg(args, int);  // 将参数列表内的下一个参数解析为指定类型
-    }
-
-    va_end(args);   // 参数列表解析结束
-    return total;
-}
-
-int main() {
-    printf("%d\n", sum(4, 10, 20, 30, 40));  // 输出 100
-}
-```
-
-让我们复杂一点：
-```c
-// stdio.c
-#include <stdarg.h>
-#include <stdint.h>
-
-// char* itoa(uint64_t int_target, char base)
-// 假设该函数已被定义，该函数功能：将整数转为ascii字符，规定进制。
-
-// 实现一个简单的printf函数，实际上C语言的printf远比该函数实现复杂。
-void printf(const char* fmt, ...) {
-    va_list args;
-    va_start(args, fmt);
-    // parse data.
-    while (*fmt) {      // 控制流详见第5章。
-        if (*fmt == '%') {
-            // numbers format, as: d, x, b, o.
-            fmt++;
-            switch (*fmt) {
-                case 'd':  // decimal
-                    puts(itoa(va_arg(args, long long), 10));
-                    break;
-                case 'x':  // hexadecimal
-                    puts(itoa(va_arg(args, long long), 16));
-                    break;
-                case 'b':  // binary
-                    puts(itoa(va_arg(args, long long), 2));
-                    break;
-                case 'o':  // octal
-                    puts(itoa(va_arg(args, long long), 8));
-                    break;
-            }
-        } else {
-            // just print the character.
-            putc(*fmt, 0, 0);
-        }
-        fmt++;
-    }
-    va_end(args);
-}
-```
-
-
 
 ## 4. 内存管理
 
@@ -1516,7 +1405,6 @@ int main() {
 ### 5.2 多分支（switch）
 
 当根据整型或枚举值选择不同路径时，`switch`远比一系列的`if-else`更清晰：
-当根据整型或枚举值选择不同路径时，`switch`远比一系列的`if-else`更清晰：
 
 ```c
 switch (expr) {
@@ -1533,8 +1421,6 @@ switch (expr) {
 
 注意：忘记`break`会导致“穿透”（fall-through）。该特性有时可有意为之。
 - 穿透：在`switch`内，自动执行其他`case`项，或`default`项。
-注意：忘记`break`会导致“穿透”（fall-through）。该特性有时可有意为之。
-- 穿透：在`switch`内，自动执行其他`case`项，或`default`项。
 
 ### 5.3 循环（for / while / do-while）
 
@@ -1547,16 +1433,13 @@ for (int i = 0; i < n; i++) {
 ```
 
 `while`循环：先判断条件再执行。
-`while`循环：先判断条件再执行。
 
 ```c
 while (cond) {
     // 当 cond 为真时重复，直到不再是真实内容。
-    // 当 cond 为真时重复，直到不再是真实内容。
 }
 ```
 
-`do-while`：至少执行一次，然后判断条件。
 `do-while`：至少执行一次，然后判断条件。
 
 ```c
@@ -1606,13 +1489,9 @@ for (int i = 0; i < 10; i++) {
 - 不要在同一表达式中对同一变量进行多次修改（未定义行为），例如 `(i++) + (++i)`。
 - 注意整型溢出与有符号/无符号比较。
 - 处理循环中的边界条件时，`画图`或写测试用例帮助验证。
-- 处理循环中的边界条件时，`画图`或写测试用例帮助验证。
 
 ## 6. 文件IO
 
-文件I（Input）/O（Output）是程序与磁盘文件交互的基本手段。标准C提供了一套以 `FILE*` 为中心的 API（`fopen`/`fclose`/`fread`/`fwrite`/`fprintf`/`fscanf` 等）。
-- 其中，`FILE*`直接描述文件。
-- 引入`<stdio.h>`以使用文件IO。
 文件I（Input）/O（Output）是程序与磁盘文件交互的基本手段。标准C提供了一套以 `FILE*` 为中心的 API（`fopen`/`fclose`/`fread`/`fwrite`/`fprintf`/`fscanf` 等）。
 - 其中，`FILE*`直接描述文件。
 - 引入`<stdio.h>`以使用文件IO。
@@ -1620,8 +1499,6 @@ for (int i = 0; i < 10; i++) {
 ### 6.1 打开与关闭文件
 
 ```c
-#include <stdio.h>
-
 #include <stdio.h>
 
 FILE *f = fopen("path/to/file.txt", "r"); // r: 只读, w: 覆盖写入, a: 追加
@@ -1640,8 +1517,6 @@ fclose(f);
 ```c
 #include <stdio.h>
 
-#include <stdio.h>
-
 FILE *out = fopen("out.txt", "w");
 if (out) {
     fprintf(out, "姓名: %s 年龄: %d\n", "张三", 30);
@@ -1653,8 +1528,6 @@ if (out) {
 读文本：
 
 ```c
-#include <stdio.h>
-
 #include <stdio.h>
 
 char buf[256];
@@ -1678,8 +1551,6 @@ if (in) {
 ```c
 #include <stdio.h>
 
-#include <stdio.h>
-
 struct Point { int x, y; } p = {1,2};
 FILE *fb = fopen("pts.bin", "wb");
 fwrite(&p, sizeof(p), 1, fb);
@@ -1696,8 +1567,6 @@ fclose(fr);
 ### 6.4 文件定位与文件大小
 
 ```c
-#include <stdio.h>
-
 #include <stdio.h>
 
 fseek(f, 0, SEEK_END);
@@ -1743,7 +1612,6 @@ char *read_all(const char *path) {
 ## 7. 结构体（struct）与 typedef
 
 结构体用于把不同类型的数据**组合**在一起，常用于表示记录或对象样式的数据。
-结构体用于把不同类型的数据**组合**在一起，常用于表示记录或对象样式的数据。
 
 ```c
 struct Person {
@@ -1756,9 +1624,7 @@ struct Person p = {"张三", 30, 175.5};
 printf("%s %d %.1f\n", p.name, p.age, p.height);
 ```
 对于一个结构体而言，其内部的内存是**连续**的。
-对于一个结构体而言，其内部的内存是**连续**的。
 
-可以使用`typedef`为类型创建别名，常与结构体一起使用以简化类型名：
 可以使用`typedef`为类型创建别名，常与结构体一起使用以简化类型名：
 
 ```c
@@ -1888,7 +1754,6 @@ int main() {
     int id1 = 1, id2 = 2;
     pthread_create(&t1, NULL, worker, &id1);
     pthread_create(&t2, NULL, worker, &id2);
-    pthread_join(t1, NULL); // join函数会阻塞时间，
     pthread_join(t1, NULL); // join函数会阻塞时间，
     pthread_join(t2, NULL);
     return 0;
@@ -2081,81 +1946,6 @@ sem_destroy(&sem);
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_mutex_t m = PTHREAD_MUTEX_INITIALIZER;
 pthread_cond_t cv = PTHREAD_COND_INITIALIZER;
-
-// 等待线程：
-pthread_mutex_lock(&m);
-while (!predicate()) { // 使用 while 而不是 if，防止虚假唤醒
-        pthread_cond_wait(&cv, &m); // atomically unlock m and wait
-}
-// predicate 满足，处理共享数据
-pthread_mutex_unlock(&m);
-
-// 通知线程：
-pthread_mutex_lock(&m);
-// 更新状态，使 predicate() 为真
-pthread_cond_signal(&cv);    // 唤醒一个等待者
-// 或者 pthread_cond_broadcast(&cv); // 唤醒所有等待者
-pthread_mutex_unlock(&m);
-```
-
-- 关键点：
-    - `pthread_cond_wait` 调用会在原子性地解锁互斥锁后进入等待，返回时会重新加锁。必须在加锁状态下调用 `pthread_cond_wait`。
-    - 用 `while` 循环检查条件以应对虚假唤醒或多个线程竞争唤醒的情况。
-    - `pthread_cond_signal` 只是通知一个等待线程；若多个线程需同时继续，应使用 `pthread_cond_broadcast`。
-
-6) 避免死锁的常见策略
-
-- 按固定顺序加锁（lock ordering）。
-- 使用 trylock（非阻塞尝试）并在失败时回退释放已持有的锁然后重试或采取其他策略。
-- 限制锁的粒度与持有时间，尽量缩小临界区。
-- 使用更高级的并发数据结构或无锁算法（lock-free）以减少锁竞争。
-
-7) C11 原子（stdatomic.h）简介
-
-- C11 标准提供了原子类型和原子操作，用于实现无数据竞争的并发访问。核心头文件为 `<stdatomic.h>`。
-
-简单示例：
-
-```c
-#include <stdatomic.h>
-atomic_int a = 0;
-atomic_fetch_add(&a, 1); // 原子加
-int v = atomic_load(&a); // 原子读
-atomic_store(&a, 5);     // 原子写
-```
-
-- memory_order（内存序）常用选项：
-    - `memory_order_relaxed`：仅保证原子性，不保证跨线程的可见性顺序。
-    - `memory_order_acquire`：在加载操作上使用，保证随后的读/写不会被重排序到 acquire 之前。
-    - `memory_order_release`：在存储操作上使用，保证之前的读/写不会被重排序到 release 之后。
-    - `memory_order_acq_rel`：load+store 的复合语义（用于 read-modify-write 操作）。
-    - `memory_order_seq_cst`：最严格的序，提供全序一致性（默认）。
-
-示例（release-acquire 通信）：
-
-```c
-atomic_int flag = 0;
-int data = 0;
-
-// 生产者
-data = 42;                     // 普通写数据
-atomic_store_explicit(&flag, 1, memory_order_release);
-
-// 消费者
-if (atomic_load_explicit(&flag, memory_order_acquire) == 1) {
-        // 现在可以安全读取 data
-        printf("data = %d\n", data);
-}
-```
-
-- 使用原子变量可避免某些情形下的锁，但需要理解内存序和可见性语义；错误使用会导致难以察觉的并发 bug。
-
-8) 小结与推荐实践
-
-- 优先使用互斥锁 + 条件变量实现常见的等待/通知逻辑；当性能成为瓶颈时分析是否使用读写锁或自旋锁（仅限短临界区）。
-- 对跨进程同步，使用 POSIX 命名信号量或系统级同步原语（如 futex、Win32 同步对象）。
-- 当需要高性能并发结构时，学习 C11 原子和 lock-free 算法；在不熟悉内存序时优先使用 `memory_order_seq_cst`。
-
 
 // 等待线程：
 pthread_mutex_lock(&m);
