@@ -74,6 +74,7 @@ sudo --version
 | `run` | Run  | 从镜像创建一个容器实例并启动 | 参数：`-d`后台运行，`-p`端口映射，`--name`命名容器 |
 | `ps` | Process Status | 查看正在运行的容器 | 参数：`-a`查看所有容器（包括已停止的） |
 | `images` | Images | 查看本地镜像列表  | - |
+| `attach` | Attach | 连接入容器 | `docker attach <容器ID>` |
 | `search` | Search | 搜索远程仓库镜像列表 | `search nginx`以输出带有关键词nginx的镜像 |
 | `pull` | Pull | 从远程仓库拉取镜像 | 例：`pull nginx:latest` |
 | `stop` | Stop | 停止运行中的容器 | `stop <容器ID/容器名>`  |
@@ -81,7 +82,7 @@ sudo --version
 | `volume` | Volume | 命名卷管理器（持久化需使用） | - |
 | `rm` | Remove | 删除容器 | 参数：`-f`强制删除正在运行的容器 |
 | `rmi` | Remove Image | 删除镜像  | - |
-| `exec` | Exec | 在容器中执行命令 | 参数：`-it`交互式模式（常用于进入容器） |
+| `exec` | Exec | 在**正在运行的**容器中执行命令 | 参数：`-it`交互式模式（常用于进入容器） |
 | `logs` | Logs | 查看容器日志  | 参数：`-f`实时跟随日志输出 |
 | `inspect` | Inspect | 查看容器基本信息 | 返回JSON信息，可用`--format`指定字段。 |
 
@@ -125,7 +126,7 @@ docker pull postgres:15
 #### 2.1.2 基于拉取的镜像创建（并启动）容器
 现在开始基于镜像启动容器。容器是基于镜像创建的实例，实例之间运行状态互相独立。
 
-补充 - `run`指令的基本用法：
+补充：`run`指令的基本用法：
 ```bash
 docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 ```
@@ -136,8 +137,12 @@ docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
   - `-d`：后台运行容器（detached mode）。
   - `--name <name>`：为容器指定名字，方便管理。
   - `-p <host_port>:<container_port>`：端口映射，把容器对外提供的端口映射到宿主机端口。
+    - `-P`：将容器暴露的所有端口自动随机映射到宿主机的端口上。
   - `-e KEY=VALUE`：设置环境变量（常用于数据库密码等配置）。
   - `-it`：交互式终端模式，常用于进入容器。
+    - 其中可拆解为：
+    - `-i`：交互式
+    - `-t`：终端
 - `[ARG...]`：其他参数。
 
 例：
@@ -207,6 +212,9 @@ luna@[CENSORED]:~/docker$ docker ps
 CONTAINER ID   IMAGE             COMMAND                  CREATED          STATUS          PORTS                                         NAMES
 438d52c69b84   postgres:latest   "docker-entrypoint.s…"   27 minutes ago   Up 40 seconds   0.0.0.0:1980->5432/tcp, [::]:1980->5432/tcp   luna
 ```
+
+### 2.1.4 暂离容器、重新进入容器
+
 
 ### 2.2 容器数据的持久化
 Docker容器本身是**临时的**。当容器停止或被删除后，容器内数据会**丢失**。

@@ -1,3 +1,5 @@
+# 本教程含有大量错误，正在紧急修订中，请不要看这个。
+
 ## 0. 引言
 Github: 月と猫 - LunaNeko https://github.com/LunaticLegacy
 
