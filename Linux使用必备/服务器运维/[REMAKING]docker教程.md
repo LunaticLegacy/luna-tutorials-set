@@ -131,19 +131,19 @@ docker pull postgres:15
 docker run [OPTIONS] IMAGE [COMMAND] [ARG...]
 ```
 参数说明：
-- `IMAGE`：要运行的镜像名称，例如`postgres:latest`。*如果镜像不存在，docker会自动下载之。*
+- `IMAGE`：要运行的镜像名称，例如`postgres:latest`。*如果镜像不存在，docker会自动下载。*
 - `[COMMAND]`：容器启动后执行的命令，例如`/bin/bash`或数据库启动命令。
 - `[OPTIONS]` 常用选项：
   - `-d`：后台运行容器（detached mode）。
   - `--name <name>`：为容器指定名字，方便管理。
   - `-p <host_port>:<container_port>`：端口映射，把容器对外提供的端口映射到宿主机端口。
     - `-P`：将容器暴露的所有端口自动随机映射到宿主机的端口上。
-  - `-e KEY=VALUE`：设置环境变量（常用于数据库密码等配置）。
+  - `-e KEY=VALUE`：设置容器内部环境变量（常用于数据库密码等配置）。
   - `-it`：交互式终端模式，常用于进入容器。
     - 其中可拆解为：
     - `-i`：交互式
     - `-t`：终端
-- `[ARG...]`：其他参数。
+- `[ARG...]`：容器内部初始化命令参数。
 
 例：
 ```bash
@@ -173,9 +173,9 @@ CONTAINER ID   IMAGE             COMMAND                  CREATED          STATU
 docker exec -it luna psql -U postgres
 ```
 其中，`exec`指令的使用说明如下：
-- `-U`：user，指定进入容器内的用户名，默认为`root`——但有些容器可能不认这个名字，所以请自行指定名字。
+- `-U`：user，指定进入容器内的用户名，默认为`root`。*有些容器可能不认这个名字，所以请自行指定名字。*
 - `-i`：保持标准输入流（`stdin`）打开。速记：`in`。
-- `-t`：为该指令分配一个伪终端。速记：`tty`。
+- `-t`：为该指令分配一个伪终端。速记：`terminla`。
 
 ```bash
 docker exec -it luna psql -U postgres
@@ -214,6 +214,15 @@ CONTAINER ID   IMAGE             COMMAND                  CREATED          STATU
 ```
 
 ### 2.1.4 暂离容器、重新进入容器
+
+暂离容器：
+- 使用快捷键：``
+
+重新接入容器：`Ctrl + P`，然后`Ctrl + Q`。
+
+```bash
+docker attach <容器id或容器名>
+```
 
 
 ### 2.2 容器数据的持久化
