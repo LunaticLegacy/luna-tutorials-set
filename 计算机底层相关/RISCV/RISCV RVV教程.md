@@ -3,11 +3,12 @@ Github: 月と猫 - LunaNeko https://github.com/LunaticLegacy
 
 CC-BY-NC-SA 4.0
 
-本文为基于C的RVV SIMD指令教程。
+本文为基于C语言的RVV指令教程。
 
 - 我为什么要学习这个？
   - 一句话：如果你不是RISC-V开发者，且不是来**凹性能**的，可以不看这个。
-  - SIMD（Single Instruction Multiple Data，单指令多数据）指令比起普通指令，在计算期间可省去中途的取指令开销。因此计算效率会更快。
+  - ~~SIMD（Single Instruction Multiple Data，单指令多数据）指令比起普通指令，在计算期间可省去中途的取指令开销。因此计算效率会更快。~~
+    - `纠正：向量化计算不是SIMD。`
 
 ### 0.1 准备工作
 
@@ -19,7 +20,7 @@ CC-BY-NC-SA 4.0
 #include <riscv_vector.h>
 ```
 
-以使用RVV SIMD函数。
+以使用RVV系列函数。
 
 以及，前排提醒：`F[屏蔽]k IntelliSense`。这东西有时候是真的不会提醒RISC-V的向量函数，包括数据类型。
 
@@ -491,7 +492,12 @@ grad2(const int hash, const float x, const float y)
 }
 
 float
-noise2(float x, float y, const float repeatx, const float repeaty, const int base)
+noise2(
+  float x, 
+  float y, 
+  const float repeatx, 
+  const float repeaty, 
+  const int base)
 {
 	float fx, fy;
 	int A, AA, AB, B, BA, BB;
